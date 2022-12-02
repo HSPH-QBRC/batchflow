@@ -24,7 +24,7 @@ resource "aws_batch_compute_environment" "nextflow" {
     ]
 
     subnets = [
-      aws_subnet.public.id
+      aws_subnet.private.id
     ]
 
     type = "EC2"
