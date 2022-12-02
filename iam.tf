@@ -34,6 +34,28 @@ resource "aws_iam_policy" "ecs_s3_access" {
 EOF
 }
 
+resource "aws_iam_policy" "ecs_ebs" {
+  name   = "AutoscaleEBS"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:createTags",
+                "ec2:createVolume",
+                "ec2:attachVolume",
+                "ec2:deleteVolume",
+                "ec2:modifyInstanceAttribute",
+                "ec2:describeVolumes"
+            ],
+            "Resource": ["*"]
+        }
+    ]
+}
+EOF
+}
 
 resource "aws_iam_role" "ecs_instance" {
 
@@ -56,6 +78,7 @@ EOF
 }
 
 
+
 resource "aws_iam_role_policy_attachment" "ecs_for_ec2" {
   role       = aws_iam_role.ecs_instance.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
@@ -67,9 +90,13 @@ resource "aws_iam_role_policy_attachment" "ecs_s3_access" {
   policy_arn = aws_iam_policy.ecs_s3_access.arn
 }
 
+resource "aws_iam_role_policy_attachment" "ecs_ebs_access" {
+  role       = aws_iam_role.ecs_instance.name
+  policy_arn = aws_iam_policy.ecs_ebs.arn
+}
 
 resource "aws_iam_instance_profile" "ecs_instance" {
-  name = "ecs_instance_role"
+  name = "nextflow_ecs_instance_role"
   role = aws_iam_role.ecs_instance.name
 }
 
@@ -106,27 +133,27 @@ resource "aws_iam_role_policy_attachment" "batch_service" {
 
 # This role and associated policy are needed to use the SPOT type
 # compute environment for AWS Batch
-resource "aws_iam_role" "spot_fleet" {
-  name = "nextflow_spot_fleet_role"
+# resource "aws_iam_role" "spot_fleet" {
+#   name = "nextflow_spot_fleet_role"
 
-  assume_role_policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-    {
-        "Action": "sts:AssumeRole",
-        "Effect": "Allow",
-        "Principal": {
-            "Service": "spotfleet.amazonaws.com"
-        }
-    }
-    ]
-}
-EOF
-}
+#   assume_role_policy = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#     {
+#         "Action": "sts:AssumeRole",
+#         "Effect": "Allow",
+#         "Principal": {
+#             "Service": "spotfleet.amazonaws.com"
+#         }
+#     }
+#     ]
+# }
+# EOF
+# }
 
 
-resource "aws_iam_role_policy_attachment" "spot_fleet" {
-  role       = aws_iam_role.spot_fleet.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole"
-}
+# resource "aws_iam_role_policy_attachment" "spot_fleet" {
+#   role       = aws_iam_role.spot_fleet.name
+#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole"
+# }

@@ -16,16 +16,15 @@ resource "aws_batch_compute_environment" "nextflow" {
       image_type = "ECS_AL2"
     }
 
-    max_vcpus     = 256
+    max_vcpus     = 64
     min_vcpus     = 0
-    desired_vcpus = 0
 
     security_group_ids = [
-      aws_security_group.batch.id,
+      aws_security_group.batch.id
     ]
 
     subnets = [
-      aws_subnet.private.id,
+      aws_subnet.public.id
     ]
 
     type = "EC2"
@@ -47,7 +46,7 @@ resource "aws_batch_compute_environment" "nextflow" {
 resource "aws_batch_job_queue" "default" {
   name     = "nextflow_queue"
   state    = "ENABLED"
-  priority = "10"
+  priority = 1
   compute_environments = [
     aws_batch_compute_environment.nextflow.arn,
   ]
