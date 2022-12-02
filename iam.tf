@@ -34,28 +34,6 @@ resource "aws_iam_policy" "ecs_s3_access" {
 EOF
 }
 
-resource "aws_iam_policy" "ecs_ebs" {
-  name   = "AutoscaleEBS"
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:createTags",
-                "ec2:createVolume",
-                "ec2:attachVolume",
-                "ec2:deleteVolume",
-                "ec2:modifyInstanceAttribute",
-                "ec2:describeVolumes"
-            ],
-            "Resource": ["*"]
-        }
-    ]
-}
-EOF
-}
 
 resource "aws_iam_role" "ecs_instance" {
 
@@ -90,10 +68,6 @@ resource "aws_iam_role_policy_attachment" "ecs_s3_access" {
   policy_arn = aws_iam_policy.ecs_s3_access.arn
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_ebs_access" {
-  role       = aws_iam_role.ecs_instance.name
-  policy_arn = aws_iam_policy.ecs_ebs.arn
-}
 
 resource "aws_iam_instance_profile" "ecs_instance" {
   name = "nextflow_ecs_instance_role"
