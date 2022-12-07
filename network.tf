@@ -38,7 +38,8 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 }
 
-
+# The public subnet has an internet gateway to 
+# allow the NAT gateway to go out.
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
   route {
@@ -47,7 +48,8 @@ resource "aws_route_table" "public" {
   }
 }
 
-
+# traffic FROM instance out to internet is run
+# through NAT (which will be placed in the public subnet)
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
   route {
