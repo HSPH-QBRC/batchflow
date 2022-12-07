@@ -56,7 +56,6 @@ EOF
 }
 
 
-
 resource "aws_iam_role_policy_attachment" "ecs_for_ec2" {
   role       = aws_iam_role.ecs_instance.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
@@ -103,31 +102,3 @@ resource "aws_iam_role_policy_attachment" "batch_service" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
 }
 
-#####################################################################################################
-
-# This role and associated policy are needed to use the SPOT type
-# compute environment for AWS Batch
-# resource "aws_iam_role" "spot_fleet" {
-#   name = "nextflow_spot_fleet_role"
-
-#   assume_role_policy = <<EOF
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#     {
-#         "Action": "sts:AssumeRole",
-#         "Effect": "Allow",
-#         "Principal": {
-#             "Service": "spotfleet.amazonaws.com"
-#         }
-#     }
-#     ]
-# }
-# EOF
-# }
-
-
-# resource "aws_iam_role_policy_attachment" "spot_fleet" {
-#   role       = aws_iam_role.spot_fleet.name
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole"
-# }
