@@ -7,8 +7,6 @@ resource "aws_batch_compute_environment" "nextflow" {
 
     allocation_strategy = "BEST_FIT"
 
-    # bid_percentage = 50
-
     instance_type = ["optimal"]
 
     ec2_configuration {
@@ -28,8 +26,6 @@ resource "aws_batch_compute_environment" "nextflow" {
     ]
 
     type = "EC2"
-    # type                = "SPOT"
-    # spot_iam_fleet_role = aws_iam_role.spot_fleet.arn
 
   }
 
