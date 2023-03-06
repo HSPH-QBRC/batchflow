@@ -2,7 +2,7 @@
 
 Terraform plan for creating a managed AWS Batch environment, in preparation for use with Nextflow. There is nothing specific to Nextflow in the infrastructure, however.
 
-Note that this branch places the Batch-spawned EC2 instances in a public subnet within your VPC. Other branches in the repo might do this differently-- see those instructions. 
+Note that this branch places the Batch-spawned EC2 instances into a *private* subnet within your VPC, so they are not accessible. For the instances themselves, their access to the internet (e.g. for pulling Docker images) is accomplished via a NAT placed in a public subnet. Other branches in the repo might do this differently-- see those instructions. 
 
 
 ## Setup
@@ -17,11 +17,10 @@ Note that this branch places the Batch-spawned EC2 instances in a public subnet 
 **Changes to make (before `terraform init` or `apply`)**:
 
 - Change the name of the bucket where we store the Terraform state in `main.tf`. Note that this *cannot* be a variable, so you must change it to an *existing* S3 bucket you own.
-- Copy `terraform.tfvars.tmpl` to `terraform.tfvars` and fill in the AMI and name of the storage bucket variables.
+- Create a tfvars file, which minimally includes the AMI identifier. Other potential variables are in `vars.tf`.
     - If you wish to use Nextflow, check the section below regarding creation of a custom AMI. If not, you can use any ECS-compatible AMI.
+    - (Optional) Set the max vCPUs and instance types in such a manner to accommodate your tasks (e.g. if launching via nextflow). Note that setting the instance types to `["optimal"]` will allows Batch to determine the machine type. Then, the maximum vCPUs and job requirements will largely determine how  many parallel tasks are run.
 - (Optional) Change/alter tags and/or AWS region in `main.tf`.
-- (Optional) Change the min/max number of vCPUs in `batch.tf`. This affects the size of the instances that can created.
-- (Optional) Change the `instance_type` list in `batch.tf` to restrict the choices of EC2 instance types. [See AWS docs](https://docs.aws.amazon.com/batch/latest/userguide/compute_environment_parameters.html) (namely parameter `instanceTypes` under the "Compute resources" heading)
 - (Optional) If your Batch compute environment is configured such that you will start an exceptional number of EC2 instances, you might need to change the VPC and subnet CIDR blocks to accommodate more machines.
 
 **Finally**
@@ -45,6 +44,10 @@ The instructions below were based on [https://www.nextflow.io/docs/latest/aws.ht
     - You will need SSH access, so you might also choose to associate this new VM with a new or existing key-pair.
 - SSH into the new instance after startup.
 - [Install the AWS cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) on the instance. Note that the nextflow docs perform an installation based on miniconda (which installs a 1.x version of AWS cli). However, the official installation docs work as well, and you get the most recent version. Note the path to the tool (e.g. `/usr/local/bin/aws`) which can be customized during the installation process.
+
+**Important notes:** If the containers you are using for your work have executables under the same path, you can end up shadowing those. For instance, if your aws cli is located at `/usr/local/bin/aws`, the EC2 instance will create a host mount at `/usr/local`. Hence, if your Docker image has a tool in `/usr/local/bin/`, the shared mount will hide it.
+
+Similarly, if your Dockerfile ends with `ENTRYPOINT ["bin/bash"]`, the jobs will not run.
 
 - Create an AMI based off this instance (using console or other method of choice). Note the custom AMI ID which is supplied in your `terraform.tfvars`.
 
