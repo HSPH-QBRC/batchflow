@@ -3,7 +3,14 @@ variable "ami_id" {
   type        = string
 }
 
-variable "result_bucket" {
-  description = "A bucket into which we place results from pipeline tasks."
-  type        = string
+variable "instance_type_choices" {
+  description = "A list of strings giving the EC2 instance types that we can choose from. The default value will allow AWS to create the instances, additionally constrained by the maximum number of vCPUs."
+  type        = list(any)
+  default     = ["optimal"]
+}
+
+variable "max_vcpus" {
+  description = "The maximum number of vCPUS available in the AWS Batch compute environment."
+  type        = number
+  default     = 64
 }

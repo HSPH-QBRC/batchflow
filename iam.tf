@@ -37,7 +37,7 @@ EOF
 
 resource "aws_iam_role" "ecs_instance" {
 
-  name = "nextflow_ecs_instance_role"
+  name = "${local.common_tags.Name}_ecs_instance_role"
 
   assume_role_policy = <<EOF
 {
@@ -69,7 +69,7 @@ resource "aws_iam_role_policy_attachment" "ecs_s3_access" {
 
 
 resource "aws_iam_instance_profile" "ecs_instance" {
-  name = "nextflow_ecs_instance_role"
+  name = "${local.common_tags.Name}_ecs_instance_role"
   role = aws_iam_role.ecs_instance.name
 }
 
@@ -78,7 +78,7 @@ resource "aws_iam_instance_profile" "ecs_instance" {
 
 
 resource "aws_iam_role" "aws_batch_service" {
-  name = "nextflow_batch_service_role"
+  name = "${local.common_tags.Name}_batch_service_role"
 
   assume_role_policy = <<EOF
 {

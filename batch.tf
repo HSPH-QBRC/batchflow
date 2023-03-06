@@ -1,20 +1,20 @@
 resource "aws_batch_compute_environment" "nextflow" {
 
-  compute_environment_name = "nextflow"
+  compute_environment_name = "${local.common_tags.Name}"
 
   compute_resources {
     instance_role = aws_iam_instance_profile.ecs_instance.arn
 
     allocation_strategy = "BEST_FIT"
 
-    instance_type = ["optimal"]
+    instance_type = var.instance_type_choices
 
     ec2_configuration {
       image_id_override = var.ami_id
       image_type = "ECS_AL2"
     }
 
-    max_vcpus     = 64
+    max_vcpus     = var.max_vcpus
     min_vcpus     = 0
 
     security_group_ids = [
@@ -40,7 +40,7 @@ resource "aws_batch_compute_environment" "nextflow" {
 
 
 resource "aws_batch_job_queue" "default" {
-  name     = "nextflow_queue"
+  name     = "${local.common_tags.Name}-queue"
   state    = "ENABLED"
   priority = 1
   compute_environments = [

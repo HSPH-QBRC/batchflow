@@ -19,8 +19,9 @@ terraform {
 }
 
 locals {
+  stack = lower(terraform.workspace)
   common_tags = {
-    Name      = "nextflow"
+    Name      = "batch-${local.stack}"
     terraform = "True"
   }
 }
