@@ -101,4 +101,3 @@ resource "aws_iam_role_policy_attachment" "batch_service" {
   role       = aws_iam_role.aws_batch_service.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
 }
-

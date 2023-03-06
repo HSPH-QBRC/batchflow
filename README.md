@@ -21,7 +21,6 @@ Note that this branch places the Batch-spawned EC2 instances into a *private* su
     - If you wish to use Nextflow, check the section below regarding creation of a custom AMI. If not, you can use any ECS-compatible AMI.
     - (Optional) Set the max vCPUs and instance types in such a manner to accommodate your tasks (e.g. if launching via nextflow). Note that setting the instance types to `["optimal"]` will allows Batch to determine the machine type. Then, the maximum vCPUs and job requirements will largely determine how  many parallel tasks are run.
 - (Optional) Change/alter tags and/or AWS region in `main.tf`.
-
 - (Optional) If your Batch compute environment is configured such that you will start an exceptional number of EC2 instances, you might need to change the VPC and subnet CIDR blocks to accommodate more machines.
 
 **Finally**
