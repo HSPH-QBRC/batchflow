@@ -41,11 +41,15 @@ The instructions below were based on [https://www.nextflow.io/docs/latest/aws.ht
     - The default root volume size (at time of writing) is 30GB. You might choose to increase the size of that volume to something sufficiently large.
         - One consideration for this lies in the specification of the number of vCPUs in the Batch compute environment (see the `aws_batch_compute_environment` resource in  `batch.tf`) and the vCPU + RAM requirements of your jobs (a `process` in nextflow parlance). These parameters (roughly) determine how AWS Batch chooses to allocate jobs on EC2 instances. 
         For example, let's say you ask for 8 processes/jobs, each of which requires 6 vCPUs and 16GB RAM. If your environment is configured to permit 96 vCPUs and you have *not* restricted the instance types, Batch might choose to start a m4.16xlarge EC2 instance (64vCPU, 256GB RAM). Then, Batch will try to run all 8 jobs on that single EC2 instance, each in its own container. Hence, you will need sufficient disk space to accommodate all 8 of those jobs. If these are, e.g. alignments, you need space for 8 genome indexes, etc. (there is no mechanism for sharing a single index). So choose disk size accordingly.
-    - You will need SSH access, so you might also choose to associate this new VM with a new or existing key-pair.
+    - You will need SSH access, so you must also choose to associate this new VM with a new or existing key-pair.
 - SSH into the new instance after startup.
-- [Install the AWS cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) on the instance. Note that the nextflow docs perform an installation based on miniconda (which installs a 1.x version of AWS cli). However, the official installation docs work as well, and you get the most recent version. Note the path to the tool (e.g. `/usr/local/bin/aws`) which can be customized during the installation process.
+- [Install the AWS cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) on the instance. Note that the nextflow docs perform an installation based on miniconda (which installs a 1.x version of AWS cli). However, the official installation docs work as well, and you get the most recent version. To avoid conflicts with software distributed in Docker containers, we recommend running the install script as follows (after unzipping the download) which will locate the AWS cli at `/opt/aws-cli/bin/aws`:
+```
+sudo ./aws/install -i /opt/aws-cli -b /opt/aws-cli/bin
+```
 
-**Important notes:** If the containers you are using for your work have executables under the same path, you can end up shadowing those. For instance, if your aws cli is located at `/usr/local/bin/aws`, the EC2 instance will create a host mount at `/usr/local`. Hence, if your Docker image has a tool in `/usr/local/bin/`, the shared mount will hide it.
+### Notes about AWS cli path:
+If the containers you are using for your work have executables under the same path, you can end up shadowing those. For instance, if your aws cli is located at the default location of `/usr/local/bin/aws`, the EC2 instance will create a host mount for your Docker containers at `/usr/local`. Hence, if your Docker image has a tool in `/usr/local/bin/`, the shared mount will hide it. By using the suggested location of `/opt/aws-cli/bin/aws`, we will (ideally) avoid such issues.
 
 Similarly, if your Dockerfile ends with `ENTRYPOINT ["bin/bash"]`, the jobs will not run.
 
